@@ -1,0 +1,16 @@
+#! /usr/bin/env -S nu --stdin
+
+def main [] {
+  parseInput
+  | each { [ ($in.l * $in.w) ($in.w * $in.h) ($in.h * $in.l) ] }
+  | each { ($in | each { 2 * $in } | math sum) + ($in | math min) }
+  | math sum
+}
+
+def parseInput [] {
+  lines
+  | split column 'x' l w h
+  | update l { $in | into int }
+  | update w { $in | into int }
+  | update h { $in | into int }
+}
