@@ -2,10 +2,9 @@
 
 def main [] {
   ($in | split chars)
-  | reduce --fold [] { |char, acc|
+  | accumulate { |char, acc|
       let last = $acc | default [0] | last | default 0
-      let level = $last + (changeFor $char)
-      $acc | append $level
+      $last + (changeFor $char)
     }
   | enumerate
   | filter { $in.item == -1 }
@@ -16,4 +15,9 @@ def main [] {
 
 def changeFor [char] {
   match $char { '(' => 1, ')' => -1, }
+}
+
+# Accumulate all values according to the given reducer.
+def accumulate [fn: closure] {
+  reduce --fold [] { |elt, acc| $acc ++ (do $fn $elt $acc) }
 }
