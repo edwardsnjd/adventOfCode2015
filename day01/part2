@@ -1,0 +1,19 @@
+#! /usr/bin/env -S nu --stdin
+
+def main [] {
+  ($in | split chars)
+  | reduce --fold [] { |char, acc|
+      let last = $acc | default [0] | last | default 0
+      let level = $last + (changeFor $char)
+      $acc | append $level
+    }
+  | enumerate
+  | filter { $in.item == -1 }
+  | first
+  | get index
+  | each { $in + 1 }
+}
+
+def changeFor [char] {
+  match $char { '(' => 1, ')' => -1, }
+}

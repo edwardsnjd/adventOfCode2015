@@ -1,0 +1,8 @@
+#! /usr/bin/env -S nu --stdin
+
+def main [] {
+  let chars = $in | split chars
+  let lefts = $chars | where $it == '(' | length
+  let rights = $chars | where $it == ')' | length
+  $lefts - $rights
+}
