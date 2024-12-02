@@ -1,0 +1,49 @@
+#! /usr/bin/env -S nu --stdin
+
+# Keep a record of the current state by coord (implicitly off)
+let grid = {}
+let turnOn  = { |v| true }
+let turnOff = { |v| false }
+let toggle  = { |v| not $v }
+
+# Update the coord with given closure
+def updateAt [g,x,y,fn] {
+  let path = $"($x),($y)"
+  let before = ($g | get --ignore-errors $path | default false)
+  let after = (do $fn $before)
+  $g | upsert $path $after
+}
+
+def main [] {
+  $in
+  | lines
+  | into command
+  | reduce --fold $grid { |elt, acc|
+      print $"($elt)"
+      $elt.yRange | reduce --fold $acc { |y, accY|
+        $elt.xRange | reduce --fold $accY { |x, accX|
+          updateAt $accX $x $y $elt.operation
+        }
+      }
+    }
+  | transpose coord val
+  | filter { $in.val }
+  | length
+}
+
+def "into command" [] {
+  parse --regex '^(?<op>turn on|turn off|toggle) (?<x1>\d+),(?<y1>\d+) through (?<x2>\d+),(?<y2>\d+)$'
+  | update x1 { $in | into int }
+  | update x2 { $in | into int }
+  | update y1 { $in | into int }
+  | update y2 { $in | into int }
+  | insert xRange  { |row| ($row.x1)..($row.x2) }
+  | insert yRange  { |row| ($row.y1)..($row.y2) }
+  | upsert operation { |row|
+      match $row.op {
+        "turn on" => $turnOn,
+        "turn off" => $turnOff,
+        "toggle" => $toggle,
+      }
+    }
+}
