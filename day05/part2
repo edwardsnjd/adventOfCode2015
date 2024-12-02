@@ -3,8 +3,9 @@
 def main [] {
   let hasAPairOfLettersThatAppearAtLeastTwice = { |line|
     $line | split chars | window 2 | enumerate | any {
+      let startIndex = $in.index
       let pair = $"($in.item.0)($in.item.1)"
-      let restOfLine = $line | str substring ($in.index + 2)..
+      let restOfLine = $line | str substring ($startIndex + 2)..
       $restOfLine | str contains $pair
     }
   }
