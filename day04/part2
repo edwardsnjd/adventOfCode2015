@@ -1,0 +1,12 @@
+#! /usr/bin/env -S nu --stdin
+
+def main [] {
+  let input = $in | str trim
+  0..10000000
+  | each { $"($input)($in)" }
+  | each { $in | hash md5 }
+  | enumerate
+  | filter { $in.item | str starts-with "000000" }
+  | each { $in.index }
+  | first
+}
