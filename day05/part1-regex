@@ -1,0 +1,6 @@
+#! /usr/bin/env bash
+
+grep -vE "ab|cd|pq|xy" \
+| grep -E "[aeiou].*[aeiou].*[aeiou]" \
+| grep -E "(.)\1" \
+| wc -l
