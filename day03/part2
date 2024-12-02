@@ -1,0 +1,43 @@
+#! /usr/bin/env -S nu --stdin
+
+def main [] {
+  parseInput
+  | alternating | each { $in | findVisited } | flatten
+  | group-by --to-table { $"($in.0)x($in.1)" }
+  | length
+}
+
+def parseInput [] {
+  split chars | each {
+    match $in {
+      '>' => [( 1) ( 0)],
+      '<' => [(-1) ( 0)],
+      '^' => [( 0) ( 1)],
+      'v' => [( 0) (-1)],
+    }
+  }
+}
+
+def findVisited [] {
+  scan [[0,0]] { |elt, acc|
+    let start = $acc | last
+    [($start.0 + $elt.0) ($start.1 + $elt.1)]
+  }
+}
+
+def scan [init: any, fn: closure] {
+  reduce --fold $init { |elt, acc| $acc | append [(do $fn $elt $acc)] }
+}
+
+def alternating [] {
+  enumerate
+  | partition { |e| $e.index mod 2 == 0 }
+  | each { $in | each { |e| $e.item } }
+}
+
+def partition [predicate: closure] {
+  [
+    ($in | filter { (do $predicate $in) })
+    ($in | filter { not (do $predicate $in) })
+  ]
+}

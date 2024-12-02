@@ -1,0 +1,30 @@
+#! /usr/bin/env -S nu --stdin
+
+def main [] {
+  parseInput
+  | findVisited
+  | group-by --to-table { $"($in.0)x($in.1)" }
+  | length
+}
+
+def parseInput [] {
+  split chars | each {
+    match $in {
+      '>' => [( 1) ( 0)],
+      '<' => [(-1) ( 0)],
+      '^' => [( 0) ( 1)],
+      'v' => [( 0) (-1)],
+    }
+  }
+}
+
+def findVisited [] {
+  scan [[0,0]] { |elt, acc|
+    let start = $acc | last
+    [($start.0 + $elt.0) ($start.1 + $elt.1)]
+  }
+}
+
+def scan [init: any, fn: closure] {
+  reduce --fold $init { |elt, acc| $acc | append [(do $fn $elt $acc)] }
+}
