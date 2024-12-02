@@ -2,8 +2,8 @@
 
 def main [] {
   ($in | split chars)
-  | accumulate { |char, acc|
-      let last = $acc | default [0] | last | default 0
+  | accumulate [0] { |char, acc|
+      let last = $acc | last
       $last + (changeFor $char)
     }
   | enumerate
@@ -18,6 +18,6 @@ def changeFor [char] {
 }
 
 # Accumulate all values according to the given reducer.
-def accumulate [fn: closure] {
-  reduce --fold [] { |elt, acc| $acc ++ (do $fn $elt $acc) }
+def accumulate [init: any, fn: closure] {
+  reduce --fold $init { |elt, acc| $acc ++ (do $fn $elt $acc) }
 }
