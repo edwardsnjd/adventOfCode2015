@@ -1,0 +1,20 @@
+#! /usr/bin/env -S nu --stdin
+
+def main [] {
+  let hasAPairOfLettersThatAppearAtLeastTwice = { |line|
+    $line | split chars | window 2 | enumerate | any {
+      let pair = $"($in.item.0)($in.item.1)"
+      let restOfLine = $line | str substring ($in.index + 2)..
+      $restOfLine | str contains $pair
+    }
+  }
+  let hasALetterThatRepeatsWithExactlyOneBetween = { |line|
+    $line | split chars | window 3 | any { $in.0 == $in.2 }
+  }
+
+  $in
+  | lines
+  | filter $hasAPairOfLettersThatAppearAtLeastTwice
+  | filter $hasALetterThatRepeatsWithExactlyOneBetween
+  | length
+}

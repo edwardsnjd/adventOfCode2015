@@ -1,0 +1,24 @@
+#! /usr/bin/env -S nu --stdin
+
+def main [] {
+  let vowels = [ "a" "e" "i" "o" "u" ]
+  let hasAtLeastThreeVowels = { |line|
+    ($line | split chars | where { $in in $vowels } | length) >= 3 
+  }
+  let hasAtLeastOneRepeatedLetter = { |line|
+    $line | split chars | window 2 | any { $in.0 == $in.1 }
+  }
+  let bannedSubstrings = [ "ab" "cd" "pq" "xy" ]
+  let doesNotHaveBannedSubstrings = { |line|
+    $bannedSubstrings | all { |banned|
+      not ($line | str contains $banned)
+    }
+  }
+
+  $in
+  | lines
+  | filter $hasAtLeastThreeVowels
+  | filter $hasAtLeastOneRepeatedLetter
+  | filter $doesNotHaveBannedSubstrings
+  | length
+}
