@@ -28,6 +28,7 @@ data class Command(
 fun turnOn(v: Int) = v + 1
 fun turnOff(v: Int) = kotlin.math.max(v - 1, 0)
 fun toggle(v: Int) = v + 2
+
 fun operation(op: String) = when (op) {
   "turn on" -> ::turnOn
   "turn off" -> ::turnOff
@@ -41,14 +42,9 @@ val commands = generateSequence(::readlnOrNull).map(Command::parse)
 IntArray(1000000)
   .also { grid ->
     commands.forEach {
-      val xMin = kotlin.math.min(it.x1, it.x2)
-      val xMax = kotlin.math.max(it.x1, it.x2)
-      val yMin = kotlin.math.min(it.y1, it.y2)
-      val yMax = kotlin.math.max(it.y1, it.y2)
       val op = operation(it.op)
-
-      for (y in yMin..yMax) {
-        for (x in xMin..xMax) {
+      for (y in it.y1..it.y2) {
+        for (x in it.x1..it.x2) {
           val idx = y * 1000 + x
           grid[idx] = op(grid[idx])
         }
