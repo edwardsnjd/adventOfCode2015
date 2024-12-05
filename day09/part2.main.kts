@@ -25,15 +25,13 @@ class Graph {
 private fun <E> permutations(source: List<E>): List<List<E>> =
   if (source.count() == 1) listOf(source)
   else source.flatMapIndexed { ind, first ->
-    val rest = source.take(ind) + source.drop(ind+1)
-    permutations(rest).map {
-      buildList {
-        add(first)
-        addAll(it)
-      }
-    }
+    source.withoutNth(ind)
+      .let(::permutations)
+      .map { it.prepend(first) }
   }
 
+fun <E> List<E>.withoutNth(ind: Int): List<E> = take(ind) + drop(ind+1)
+fun <E> List<E>.prepend(item: E): List<E> = listOf(item) + this
 
 generateSequence(::readlnOrNull)
   .map(::parse)
