@@ -22,19 +22,24 @@ class Graph {
   }
 }
 
-private fun <E> combinations(source: List<E>): List<List<E>> {
-  fun combos(rest: List<E>, soFar: List<E>): List<List<E>> =
-    if (rest.isEmpty()) listOf(soFar)
-    else rest.flatMap { combos(rest - it, soFar + it) }
+private fun <E> permutations(source: List<E>): List<List<E>> =
+  if (source.count() == 1) listOf(source)
+  else source.flatMapIndexed { ind, first ->
+    val rest = source.take(ind) + source.drop(ind+1)
+    permutations(rest).map {
+      buildList {
+        add(first)
+        addAll(it)
+      }
+    }
+  }
 
-  return combos(source, listOf())
-}
 
 generateSequence(::readlnOrNull)
   .map(::parse)
   .fold(Graph(), Graph::add)
   .let { graph ->
-    combinations(graph.nodes.toList())
+    permutations(graph.nodes.toList())
       .map { it.windowed(2).map { (f, t) -> graph.distance(f, t)!! }.sum() }
       .max()
   }
